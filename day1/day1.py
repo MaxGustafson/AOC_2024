@@ -43,6 +43,34 @@ def calculate_distance( list_a : list, list_b : list, debug = False):
         total_sum += abs(list_a[i]-list_b[i])
 
     return total_sum 
+
+def build_similarity_dict(input_list : list):
+    similarity_dict : dict = {}
+
+    for e in input_list:
+        add_element_to_dict(e, similarity_dict)
+
+    return similarity_dict
+
+def add_element_to_dict(e : int, target_dict : dict):
+
+    if(e not in target_dict):
+        target_dict[e] = 0
+
+    target_dict[e] = target_dict[e] + 1
+
+def evaluate_similarity_score(target_list : list, similarity_dict : dict):
+    score = 0
+
+    for e in target_list:
+
+        delta = 0
+        if(e in similarity_dict):
+            delta = e * similarity_dict[e]
+        
+        score += delta
+
+    return score
             
 
     
@@ -50,15 +78,25 @@ def calculate_distance( list_a : list, list_b : list, debug = False):
 def main():
     input_file = "input_1.txt"
     input_file_path = "data/" + input_file
-    list_a, list_b = parse_input(input_file_path,True)
+    list_a, list_b = parse_input(input_file_path)
     list_a.sort()
     list_b.sort()
-    total_sum = calculate_distance(list_a, list_b,True)
+    total_sum = calculate_distance(list_a, list_b)
 
     print(f"Total Distance = {total_sum}")
+
+def main_2():
+    input_file = "input_1.txt"
+    input_file_path = "data/" + input_file
+    list_a, list_b = parse_input(input_file_path)
+    similarity_dict = build_similarity_dict(list_b)
+    score = evaluate_similarity_score(list_a, similarity_dict)
+    
+    print(f"Similarity Score = {score}")
 
     
 
 if __name__ == '__main__':
     main()
+    main_2()
     
