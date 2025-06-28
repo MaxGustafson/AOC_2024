@@ -23,25 +23,33 @@ def parse_input(file_name : str, debug : int = False):
         1 = safe
         0 = unsafe
 '''
-def evaluate_report(level : list, debug = False):
-    if(level is None):
+def evaluate_report(report : list, debug = False):
+    if(report is None):
          raise Exception("Can't eveluate None")
     
+    if debug:
+        print(f"\n Report to evaluate {report}")
     delta = 0
     delta_pre = 0
 
-    for i in range(1,len(level),1):
-        delta = level[i] - level[i-1]
+    nbr_unsafe_levels = 0
+
+    for i in range(1,len(report),1):
+        delta = report[i] - report[i-1]
         if debug:
             print(f"iteration {i}")
             print(f"delta = {delta}")
             print(f"delta_pre = {delta_pre}")
+            print(f"nbr of unsafe levels = {nbr_unsafe_levels}")
 
         if abs(delta) > 3 or\
               delta == 0 or\
                   (i != 1 and np.sign(delta) != np.sign(delta_pre)):
-             return 0
+             nbr_unsafe_levels += 1
+             print(f"level unsafe. nbr of unsafe levels = {nbr_unsafe_levels}")
              
+        if nbr_unsafe_levels > 1:
+            return 0
         delta_pre = delta
 
     return 1
@@ -49,18 +57,18 @@ def evaluate_report(level : list, debug = False):
     
      
 def main(debug = False):
-    input_file = "input.txt"
+    input_file = "input_mini.txt"
     input_file_path = "day2/data/" + input_file
-    report_list = parse_input(input_file_path, debug)
+    report_list = parse_input(input_file_path)
 
     nbr_safe : int = 0
 
     for i in range(len(report_list)):
-        nbr_safe+=evaluate_report(report_list[i])
+        nbr_safe+=evaluate_report(report_list[i], debug)
 
-    print(f"Number safe report = {nbr_safe}")
+    print(f"\nNumber safe report = {nbr_safe}")
    
 if __name__ == '__main__':
-    main()
+    main(True)
 
     
