@@ -8,6 +8,33 @@ def parse_input(file_name : str, debug : bool = False):
 
     return input_str
 
+'''
+    Remove parts of the string which is disabled by a don't command
+'''
+def remove_disabled_commands(input : str, debug : bool = False):
+    if debug:
+        print(f"Orginal String:\n {input}")
+    
+    while(True):
+
+        if 'don\'t()' not in input:
+            break
+
+        i_start = input.find('don\'t()')
+        i_end = input[i_start:].find('do()') + i_start + 4 #len('do()')
+
+        if debug:
+            print(f"Removing from {i_start} to {i_end}:\n {input[i_start:i_end]}")
+            print(i_start)
+            print(i_end)
+        
+        input = input[:i_start] + input[i_end:]
+
+    if debug:
+        print(f"Returning pruned string: {input}")
+    return input
+
+
 def clean_input(input : str, debug : bool = True):
 
     input_list = input.split("mul")
@@ -54,13 +81,13 @@ def evaluate_cleaned_computer_commands(mul_pairs : list, debug : bool = False):
 
 
 
-
 def main():
     input_file = "input.txt"
     input_file_path = "day3/data/" + input_file
 
     input_str = parse_input(input_file_path, False)
-    factor_pairs = clean_input(input_str, False)
+    pruned_str = remove_disabled_commands(input_str, True) #Use for part 2
+    factor_pairs = clean_input(pruned_str, False)
     total_sum = evaluate_cleaned_computer_commands(factor_pairs,False)
 
     print(total_sum)
