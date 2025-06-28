@@ -5,7 +5,7 @@ def parse_input(file_name : str, debug : int = False):
     if(debug):
         print(f"file_name {file_name}")
 
-    level_list = []
+    report_list = []
     with open(file_name, "r") as file:
         
         for line in file:
@@ -13,9 +13,9 @@ def parse_input(file_name : str, debug : int = False):
                     print(f"Input line : {line}")  # .strip() removes the newline character
 
                 val = line.strip().split()
-                level_list.append([int(x) for x in val])
+                report_list.append([int(x) for x in val])
 
-    return level_list
+    return report_list
 
     
 '''
@@ -23,7 +23,7 @@ def parse_input(file_name : str, debug : int = False):
         1 = safe
         0 = unsafe
 '''
-def evaluate_level(level : list, debug = False):
+def evaluate_report(level : list, debug = False):
     if(level is None):
          raise Exception("Can't eveluate None")
     
@@ -48,17 +48,17 @@ def evaluate_level(level : list, debug = False):
 
     
      
-def main():
+def main(debug = False):
     input_file = "input.txt"
     input_file_path = "day2/data/" + input_file
-    level_list = parse_input(input_file_path)
+    report_list = parse_input(input_file_path, debug)
 
     nbr_safe : int = 0
 
-    for i in range(len(level_list)):
-        nbr_safe+=evaluate_level(level_list[i])
+    for i in range(len(report_list)):
+        nbr_safe+=evaluate_report(report_list[i])
 
-    print(f"Number safe levels = {nbr_safe}")
+    print(f"Number safe report = {nbr_safe}")
    
 if __name__ == '__main__':
     main()
