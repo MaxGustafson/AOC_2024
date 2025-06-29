@@ -28,27 +28,26 @@ def find_xmas_in_graph(value_graph, debug : bool = False):
         for j in range(len(value_graph[i])):
 
             #straight right
-            ttl_nbr_xmas += evaluate_position(value_graph, 0, 1, i, j, debug)
+            ttl_nbr_xmas += evaluate_position(value_graph, 0, 1, i, j, 'XMAS', debug)
 
             #straight left
-            ttl_nbr_xmas += evaluate_position(value_graph, 0, -1, i, j, debug)
+            ttl_nbr_xmas += evaluate_position(value_graph, 0, -1, i, j, 'XMAS', debug)
 
             #straight up
-            ttl_nbr_xmas += evaluate_position(value_graph, -1, 0, i, j, debug)
+            ttl_nbr_xmas += evaluate_position(value_graph, -1, 0, i, j, 'XMAS', debug)
 
             #straight down
-            ttl_nbr_xmas += evaluate_position(value_graph, 1, 0, i, j, debug)
+            ttl_nbr_xmas += evaluate_position(value_graph, 1, 0, i, j, 'XMAS', debug)
 
             #diagonals
-            ttl_nbr_xmas += evaluate_position(value_graph,  1, 1, i, j, debug)
-            ttl_nbr_xmas += evaluate_position(value_graph,  1, -1, i, j, debug)
-            ttl_nbr_xmas += evaluate_position(value_graph, -1, -1, i, j, debug)
-            ttl_nbr_xmas += evaluate_position(value_graph, -1, 1, i, j, debug)
+            ttl_nbr_xmas += evaluate_position(value_graph,  1, 1, i, j,  'XMAS', debug)
+            ttl_nbr_xmas += evaluate_position(value_graph,  1, -1, i, j, 'XMAS', debug)
+            ttl_nbr_xmas += evaluate_position(value_graph, -1, -1, i, j, 'XMAS', debug)
+            ttl_nbr_xmas += evaluate_position(value_graph, -1, 1, i, j,  'XMAS', debug)
 
     return ttl_nbr_xmas
 
-def evaluate_position(value_graph, x_direction, y_direction, r, c, debug):
-    target_word = 'XMAS'
+def evaluate_position(value_graph, x_direction, y_direction, r, c, target_word, debug):
     max_depth = len(target_word)
     max_row = len(value_graph) 
     
@@ -78,6 +77,26 @@ def evaluate_position(value_graph, x_direction, y_direction, r, c, debug):
             print(f"{r + i*y_direction},{c + i*x_direction} -> {value_graph[r + i*y_direction][c + i*x_direction]}")
     return 1
 
+def find_cross_mas_in_graph(value_graph, debug : bool = False):
+
+    target_chars = 'MAS'
+
+    ttl_number_cross_mas = 0
+    #Start by finding middle, so no need to evaluate border
+    for i in range(1,len(value_graph)-1,1):
+        for j in range(1,len(value_graph[i])-1,1):
+            if debug:
+                print(f"Evaluating {i},{j} -> {value_graph[i][j]}")
+            if value_graph[i][j] == 'A'\
+                and (evaluate_position(value_graph, 1, 1, i-1, j-1,'MAS',debug) == 1 or evaluate_position(value_graph, 1, 1, i-1, j-1,'SAM',debug) == 1)\
+                and (evaluate_position(value_graph, 1, -1, i+1, j-1,'MAS',debug) == 1 or evaluate_position(value_graph, 1, -1, i+1, j-1,'SAM',debug) == 1):
+
+                ttl_number_cross_mas += 1
+                if debug:
+                        print(f"Found cross with center at {i},{j} -> {value_graph[i][j]}")
+                
+    return ttl_number_cross_mas
+
 def main():
 
     input_file = "input.txt"
@@ -85,7 +104,9 @@ def main():
 
     value_graph = parse_input(input_file_path, True)
  
-    ttl_nbr_xmas = find_xmas_in_graph(value_graph, True)
+    #ttl_nbr_xmas = find_xmas_in_graph(value_graph, True) #part 1
+
+    ttl_nbr_xmas = find_cross_mas_in_graph(value_graph, True)
 
     print(ttl_nbr_xmas)
 
