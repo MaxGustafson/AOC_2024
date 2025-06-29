@@ -10,57 +10,15 @@ def parse_input(file_name : str, debug : int = False):
                 if(debug):
                     print(f"Input line : {line}")  # .strip() removes the newline character
 
-                matrix.append(line)
+                matrix.append(line.strip())
 
     if debug:
-        print(f"final matrix \n {matrix}")
+            print("Matrix:")
+            for i in range(len(matrix)):
+                print(matrix[i])
     return matrix
 
-def __find_neighbors(matrix, ind_row : int, ind_col : int, max_rows : int, max_cols : int):
-    """
-    Finds the neighbors of a cell in a matrix.
-
-    Args:
-        matrix: The input matrix (2D list).
-        ind_row: The row index of the cell.
-        ind_col: The column index of the cell.
-
-    Returns:
-        A list of tuples, where each tuple represents the (row, col) of a neighbor.
-    """
-    neighbors = []
-
-    # Define possible offsets for neighbors (up, down, left, right)
-    offsets = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1,-1), (-1,1), (1,-1), (1,1)]  # Up, Down, Left, Right, Diagonals
-
-    for row_offset, col_offset in offsets:
-        new_row = ind_row + row_offset
-        new_col = ind_col + col_offset
-
-        # Check if the new coordinates are within the matrix bounds
-        if 0 <= new_row < max_rows and 0 <= new_col < max_cols:
-            neighbors.append((new_row, new_col))
-
-    return neighbors
-
-def build_neighbour_graph(matrix, debug : bool = False):
-
-    
-
-    n_rows = len(matrix)
-    neighbour_graph = [None for i in range(n_rows)]
-    for i in range(n_rows):
-        n_cols = len(matrix[i])
-        neighbour_graph[i] = [None for j in range(n_cols)]
-        for j in range(n_cols):
-            neighbour_graph[i][j] = __find_neighbors(matrix, j, i, n_rows, n_cols)
-
-    if debug:
-        print(neighbour_graph)
-
-    return neighbour_graph
-
-def find_xmas_in_graph(value_graph, neighbour_graph, debug : bool = False):
+def find_xmas_in_graph(value_graph, debug : bool = False):
     ttl_nbr_xmas = 0
 
     '''
@@ -68,51 +26,57 @@ def find_xmas_in_graph(value_graph, neighbour_graph, debug : bool = False):
     '''
     for i in range(len(value_graph)):
         for j in range(len(value_graph[i])):
-            ttl_nbr_xmas += evaluate_position_in_graph(value_graph, neighbour_graph, i, j, 'X', debug)
+
+            #straight right
+            ttl_nbr_xmas += evaluate_position(value_graph, 0, 1, i, j, debug)
+
+            #straight left
+            ttl_nbr_xmas += evaluate_position(value_graph, 0, -1, i, j, debug)
+
+            #straight up
+            ttl_nbr_xmas += evaluate_position(value_graph, -1, 0, i, j, debug)
+
+            #straight down
+            ttl_nbr_xmas += evaluate_position(value_graph, 1, 0, i, j, debug)
+
+            #diagonals
+            ttl_nbr_xmas += evaluate_position(value_graph,  1, 1, i, j, debug)
+            ttl_nbr_xmas += evaluate_position(value_graph,  1, -1, i, j, debug)
+            ttl_nbr_xmas += evaluate_position(value_graph, -1, -1, i, j, debug)
+            ttl_nbr_xmas += evaluate_position(value_graph, -1, 1, i, j, debug)
 
     return ttl_nbr_xmas
 
-def evaluate_position_in_graph(value_graph, neighbour_graph, r, c, target_letter, debug : bool = False):
+def evaluate_position(value_graph, x_direction, y_direction, r, c, debug):
+    target_word = 'XMAS'
+    max_depth = len(target_word)
+    max_row = len(value_graph) 
+    
+    if debug and False:
+        print(value_graph)
+        print(f"Start at position {r},{c} -> {value_graph[r][c]}")
 
-    if debug:
-        print(f"Evaluating \n Letter : {value_graph[r][c]} \n With neighbours : {neighbour_graph[r][c]} \n Target_Letter : {target_letter} ")
-    match target_letter:
-        case 'X':
-            if value_graph[r][c] == 'X':
-                for i,j in neighbour_graph[r][c]:
-                    if evaluate_position_in_graph(value_graph, neighbour_graph, i, j, 'M', debug) == 1:
-                        return 1
-                
-            return 0 
+    for i in range(max_depth):
 
-        case 'M':
-            if value_graph[r][c] == 'M':
-                for i,j in neighbour_graph[r][c]:
-                    if evaluate_position_in_graph(value_graph, neighbour_graph, i, j, 'A', debug) == 1:
-                        return 1
+        if r + i*y_direction >= max_row or r + i*y_direction < 0 : #Check y in bound
+            return 0
             
-            return 0 
-            
-        case 'A':
-            if value_graph[r][c] == 'A':
-                for i,j in neighbour_graph[r][c]:
-                   if evaluate_position_in_graph(value_graph, neighbour_graph, i, j, 'S', debug) == 1:
-                       return 1
-            
-            return 0 
-            
-        case 'S':
-            if value_graph[r][c] == 'S':
-                return 1
-            
-            else: 
-                return 0 
-            
-        case _ :
+        max_col  = len(value_graph[r + i*y_direction]) 
+
+        if c + i*x_direction >= max_col or c + i*x_direction < 0: #Check x in bound
             return 0
 
-             
-             
+        if debug and False:
+            print(f"Next position: {r + i*y_direction},{c + i*x_direction} -> {value_graph[r + i*y_direction][c + i*x_direction]}")
+
+        if value_graph[r+ i*y_direction][c + i*x_direction] != target_word[i]: #Check letter is correct
+            return 0
+        
+    if debug:
+        print(f"Solution found:")
+        for i in range(max_depth):
+            print(f"{r + i*y_direction},{c + i*x_direction} -> {value_graph[r + i*y_direction][c + i*x_direction]}")
+    return 1
 
 def main():
 
@@ -120,8 +84,8 @@ def main():
     input_file_path = "day4/data/" + input_file
 
     value_graph = parse_input(input_file_path, True)
-    neighbour_graph = build_neighbour_graph(value_graph)
-    ttl_nbr_xmas = find_xmas_in_graph(value_graph, neighbour_graph, True)
+ 
+    ttl_nbr_xmas = find_xmas_in_graph(value_graph, True)
 
     print(ttl_nbr_xmas)
 
